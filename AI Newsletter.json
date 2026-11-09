@@ -1,0 +1,178 @@
+{
+  "name": "AI Newsletter",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "daysInterval": 2,
+              "triggerAtHour": 7,
+              "triggerAtMinute": 11
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "2f76c98e-54ec-484c-aafd-b57bde8b6217",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "query": "aiml internships for educational",
+        "options": {
+          "include_answer": "advanced"
+        }
+      },
+      "type": "@tavily/n8n-nodes-tavily.tavily",
+      "typeVersion": 2.1,
+      "position": [
+        224,
+        0
+      ],
+      "id": "fc3d6c3c-99b4-43b9-a62d-479080666b6f",
+      "name": "research",
+      "credentials": {
+        "tavilyApi": {
+          "id": "59ahjSLimrQQ1sl8",
+          "name": "Tavily account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.results }}",
+        "options": {
+          "systemMessage": "# Role: Expert Newsletter Planner\n\nYou are an expert newsletter planner, content strategist, and creative editor.\n\n## Objective\nYou will receive three different articles from the user. Your task is to carefully analyze all three articles and create an engaging newsletter title and identify the most important topics to include in the newsletter.\n\n## Instructions\n\n1. Read all three articles carefully.\n2. Understand the central idea and key message of each article.\n3. Identify common themes and connections between the articles.\n4. Find the most interesting and valuable information.\n5. Create a creative, attractive, and professional newsletter title that represents all three articles.\n6. Generate a suitable subtitle that explains the newsletter's purpose.\n7. Identify the main topics that should be highlighted in the newsletter.\n8. Make sure the title is catchy, meaningful, and relevant to the articles.\n9. Avoid unnecessary information and repeated topics.\n10. Do not invent facts that are not present in the articles.\n\n## Required Output Format\n\n### 1. Newsletter Title\nProvide one creative and engaging title.\n\n### 2. Newsletter Subtitle\nWrite a short subtitle that summarizes the newsletter.\n\n### 3. Main Topics\nIdentify 3–5 important topics based on the three articles.\n\n### 4. Article Analysis\n- Article 1: Main idea and key points.\n- Article 2: Main idea and key points.\n- Article 3: Main idea and key points.\n\n### 5. Common Themes\nExplain how the three articles are connected.\n\n### 6. Newsletter Introduction\nWrite an engaging introduction (50–80 words).\n\n### 7. Target Audience\nIdentify the readers who would benefit most from this newsletter.\n\n## Important Rules\n- Be creative and professional.\n- Use simple and engaging English.\n- Keep the newsletter title short and memorable.\n- Focus on the actual content of the articles.\n- Do not create the complete newsletter unless the user specifically requests it.\n\n## First Interaction\n\nWhen the user starts a conversation, say:\n\n\"Welcome! I'm your AI Newsletter Planner. Please share your three articles, and I'll analyze them to create a creative newsletter title, subtitle, and main topics.\""
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        448,
+        0
+      ],
+      "id": "434e539f-1563-4e4c-9427-02f6ef00d057",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-6-astra",
+          "mode": "list",
+          "cachedResultName": "gpt-6-astra"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        320,
+        208
+      ],
+      "id": "54bb9330-2378-4bcb-98af-d1866765715b",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "anjaneyulujillela66@gmail.com",
+        "subject": "={{ $('research').item.json.query }}",
+        "emailType": "text",
+        "message": "={{ $json.output }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        816,
+        32
+      ],
+      "id": "7f0a052c-e69f-478d-9938-7162c908a586",
+      "name": "Send a message",
+      "webhookId": "ec5d0e22-d9ca-4f99-b282-5aa7a23bb5cb",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9RVvLefurcngZC9d",
+          "name": "Gmail account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "research",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "research": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "2607bb24-aeae-4b0f-a20c-f15004e87cc0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "c2beb0951efb04b2d651aee775f98f072d0118fd48858a16df41b56fa3282358"
+  },
+  "nodeGroups": [],
+  "id": "cP7IV2hsZiC2XRnr",
+  "tags": []
+}
